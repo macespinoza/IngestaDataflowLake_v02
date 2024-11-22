@@ -1,0 +1,73 @@
+########################################################################################
+
+##################### Habilitar la API dataflow de ser necesario
+https://console.developers.google.com/apis/api/dataflow.googleapis.com/overview
+
+##################### Inicializar SDK
+gcloud init
+
+##################### Forzar Loging
+gcloud auth application-default login
+
+########################################################################################
+
+##################### Creacion de Plantilla
+
+mvn clean compile
+
+mvn compile exec:java -Dexec.mainClass=com.digisoft.labsqltocs.Inicio -Dexec.cleanupDaemonThreads=false -Dexec.args=" --project=proyecto --region=us-west2 --stagingLocation=gs://storage/data_temp_staging --tempLocation=gs://storage/data_templocation --templateLocation=gs://storage/data_templates/templatemysqltocs.json --runner=DataflowRunner"
+
+
+##################### Ejecucion de la plantilla por gcloud
+
+gcloud dataflow jobs run job-customers01 --gcs-location gs://ci-sandbox-data-config/data_templates/templatemysqltocs.json --region us-west2 --num-workers 2 --staging-location gs://ci-sandbox-data-config/data_templocation/staging --parameters=driverClassName=com.mysql.cj.jdbc.Driver,connectionURL=jdbc:mysql://xx.xx.xx.xx:3306/basededatos,username=usuario,password=password,query="SELECT * FROM basededatos.customers",gcslake=gs://ci-sandbox-data-datagcp/customers01
+
+########################################################################################
+
+##################### Ejemplo de envio a Function
+
+https://us-west2-ci-sandbox-data.cloudfunctions.net/cf_trigger_dataflow?prj=ci-sandbox-data&query_origen=SELECT * FROM basededatos.customers&storage=gs://mac-dtlk-lab0-dev/customers&tabla=customers
+
+
+########################################################################################
+
+##################### Ejemplo de Dataset y tablas en la capa raw
+Dataset: 
+mac_dtlk_raw_lab0_dev
+
+Tablas:
+sg_customers_raw
+sg_employees_raw
+sg_offices_raw
+sg_orderdetails_raw
+sg_orders_raw
+sg_payments_raw
+sg_productlines_raw
+sg_products_raw
+
+
+##################### Ejemplo de job raw to qty
+
+create or replace table `proyecto.mac_dtlk_qty_lab0_dev.sg_customers_qty` as
+SELECT * FROM `proyecto.mac_dtlk_raw_lab0_dev.sg_customers_raw`;
+
+create or replace table `proyecto.mac_dtlk_qty_lab0_dev.sg_employees_qty` as
+SELECT * FROM `proyecto.mac_dtlk_raw_lab0_dev.sg_employees_raw`;
+
+create or replace table `proyecto.mac_dtlk_qty_lab0_dev.sg_offices_qty` as
+SELECT * FROM `proyecto.mac_dtlk_raw_lab0_dev.sg_offices_raw`;
+
+create or replace table `proyecto.mac_dtlk_qty_lab0_dev.sg_orderdetails_qty` as
+SELECT * FROM `proyecto.mac_dtlk_raw_lab0_dev.sg_orderdetails_raw`;
+
+create or replace table `proyecto.mac_dtlk_qty_lab0_dev.sg_orders_qty` as
+SELECT * FROM `proyecto.mac_dtlk_raw_lab0_dev.sg_orders_raw`;
+
+create or replace table `proyecto.mac_dtlk_qty_lab0_dev.sg_payments_qty` as
+SELECT * FROM `proyecto.mac_dtlk_raw_lab0_dev.sg_payments_raw`;
+
+create or replace table `proyecto.mac_dtlk_qty_lab0_dev.sg_productlines_qty` as
+SELECT * FROM `proyecto.mac_dtlk_raw_lab0_dev.sg_productlines_raw`;
+
+create or replace table `proyecto.mac_dtlk_qty_lab0_dev.sg_products_qty` as
+SELECT * FROM `proyecto.mac_dtlk_raw_lab0_dev.sg_products_raw`;
